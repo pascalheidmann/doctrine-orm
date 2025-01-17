@@ -3145,6 +3145,15 @@ parameters:
 			path: src/Persisters/SqlValueVisitor.php
 
 		-
+			message: '''
+				#^Class Doctrine\\ORM\\Proxy\\Autoloader extends deprecated class Doctrine\\Common\\Proxy\\Autoloader\:
+				The Autoloader class is deprecated since doctrine/common 3\.5\.$#
+			'''
+			identifier: class.extendsDeprecatedClass
+			count: 1
+			path: src/Proxy/Autoloader.php
+
+		-
 			message: '#^Method Doctrine\\ORM\\Proxy\\DefaultProxyClassNameResolver\:\:resolveClassName\(\) should return class\-string\<T of object\> but returns class\-string\<Doctrine\\Persistence\\Proxy\<T of object\>\>\|class\-string\<T of object\>\.$#'
 			identifier: return.type
 			count: 1
@@ -3187,6 +3196,42 @@ parameters:
 			path: src/Proxy/ProxyFactory.php
 
 		-
+			message: '''
+				#^Call to method __construct\(\) of deprecated class Doctrine\\Common\\Proxy\\AbstractProxyFactory\:
+				The AbstractProxyFactory class is deprecated since doctrine/common 3\.5\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: src/Proxy/ProxyFactory.php
+
+		-
+			message: '''
+				#^Call to method generateProxyClasses\(\) of deprecated class Doctrine\\Common\\Proxy\\AbstractProxyFactory\:
+				The AbstractProxyFactory class is deprecated since doctrine/common 3\.5\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: src/Proxy/ProxyFactory.php
+
+		-
+			message: '''
+				#^Call to method getProxy\(\) of deprecated class Doctrine\\Common\\Proxy\\AbstractProxyFactory\:
+				The AbstractProxyFactory class is deprecated since doctrine/common 3\.5\.$#
+			'''
+			identifier: staticMethod.deprecatedClass
+			count: 1
+			path: src/Proxy/ProxyFactory.php
+
+		-
+			message: '''
+				#^Class Doctrine\\ORM\\Proxy\\ProxyFactory extends deprecated class Doctrine\\Common\\Proxy\\AbstractProxyFactory\:
+				The AbstractProxyFactory class is deprecated since doctrine/common 3\.5\.$#
+			'''
+			identifier: class.extendsDeprecatedClass
+			count: 1
+			path: src/Proxy/ProxyFactory.php
+
+		-
 			message: '#^Comparison operation "\<" between 0\|1\|2\|3\|4 and 0 is always false\.$#'
 			identifier: smaller.alwaysFalse
 			count: 1
@@ -3195,6 +3240,15 @@ parameters:
 		-
 			message: '#^Comparison operation "\>" between 0\|1\|2\|3\|4 and 4 is always false\.$#'
 			identifier: greater.alwaysFalse
+			count: 1
+			path: src/Proxy/ProxyFactory.php
+
+		-
+			message: '''
+				#^Instantiation of deprecated class Doctrine\\Common\\Proxy\\ProxyGenerator\:
+				The ProxyGenerator class is deprecated since doctrine/common 3\.5\.$#
+			'''
+			identifier: new.deprecated
 			count: 1
 			path: src/Proxy/ProxyFactory.php
 
@@ -3333,6 +3387,15 @@ parameters:
 		-
 			message: '#^Result of \|\| is always false\.$#'
 			identifier: booleanOr.alwaysFalse
+			count: 1
+			path: src/Proxy/ProxyFactory.php
+
+		-
+			message: '''
+				#^Return type of method Doctrine\\ORM\\Proxy\\ProxyFactory\:\:getProxy\(\) has typehint with deprecated interface Doctrine\\Common\\Proxy\\Proxy\:
+				The Proxy interface is deprecated since doctrine/common 3\.5\.$#
+			'''
+			identifier: return.deprecatedInterface
 			count: 1
 			path: src/Proxy/ProxyFactory.php
 
