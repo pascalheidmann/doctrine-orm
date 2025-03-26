@@ -758,7 +758,7 @@ methods:
     or sorting.
 
     As a general guidance, for consistent results use the Criteria API with scalar
-    values only. Note that `DateTime` and `DateTimeImmutable` are two predominant
+    values only. Note that ``DateTime`` and ``DateTimeImmutable`` are two predominant
     examples of value objects that are *not* scalars.
 
     Refrain from using special database-level column types or custom Doctrine Types
