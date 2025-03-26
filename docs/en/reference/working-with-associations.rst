@@ -765,6 +765,6 @@ methods:
     that may lead to database-specific comparison or sorting rules being applied, or
     to database-level values being different from object field values.
 
-    Provide accessor methods or property hooks for all entity fields used in criteria
-    expressions, and implement those methods in a way that their return value is the
+    Provide accessor methods for all entity fields used in criteria expressions,
+    and implement those methods in a way that their return value is the
     same as the database-level value.
