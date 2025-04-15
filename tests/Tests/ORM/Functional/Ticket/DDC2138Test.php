@@ -42,8 +42,8 @@ class DDC2138Test extends OrmFunctionalTestCase
 
         $table = $schema->getTable('users_followed_objects');
         assert($table instanceof DbalTable);
-        self::assertTrue($table->columnsAreIndexed(['object_id']));
-        self::assertTrue($table->columnsAreIndexed(['user_id']));
+        self::assertTrue(self::columnIsIndexed($table, 'object_id'));
+        self::assertTrue(self::columnIsIndexed($table, 'user_id'));
         $foreignKeys = $table->getForeignKeys();
         self::assertCount(1, $foreignKeys, 'user_id column has to have FK, but not object_id');
 
@@ -54,6 +54,17 @@ class DDC2138Test extends OrmFunctionalTestCase
         $localColumns = $fk->getLocalColumns();
         self::assertContains('user_id', $localColumns);
         self::assertCount(1, $localColumns);
+    }
+
+    private static function columnIsIndexed(DbalTable $table, string $column): bool
+    {
+        foreach ($table->getIndexes() as $index) {
+            if ($index->spansColumns([$column])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
