@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Tests\ORM\Tools;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Schema\Table as DbalTable;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -65,7 +66,7 @@ class SchemaToolTest extends OrmTestCase
         $schema = $schemaTool->getSchemaFromMetadata($classes);
 
         self::assertTrue($schema->hasTable('cms_users'), 'Table cms_users should exist.');
-        self::assertTrue($schema->getTable('cms_users')->columnsAreIndexed(['username']), 'username column should be indexed.');
+        self::assertTrue(self::columnIsIndexed($schema->getTable('cms_users'), 'username'), 'username column should be indexed.');
     }
 
     public function testAttributeOptionsArgument(): void
@@ -390,6 +391,17 @@ class SchemaToolTest extends OrmTestCase
 
         self::assertTrue($tableIndex->isUnique());
         self::assertSame(['field', 'anotherField'], $tableIndex->getColumns());
+    }
+
+    private static function columnIsIndexed(DbalTable $table, string $column): bool
+    {
+        foreach ($table->getIndexes() as $index) {
+            if ($index->spansColumns([$column])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
