@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Doctrine\Tests\ORM\Tools;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Schema\ForeignKeyConstraintEditor;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\Table as DbalTable;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Column;
@@ -43,6 +45,8 @@ use Doctrine\Tests\Models\NullDefault\NullDefaultColumn;
 use Doctrine\Tests\OrmTestCase;
 use PHPUnit\Framework\Attributes\Group;
 
+use function array_map;
+use function class_exists;
 use function count;
 use function current;
 
@@ -291,12 +295,21 @@ class SchemaToolTest extends OrmTestCase
         ];
 
         foreach ($childTableForeignKeys as $foreignKey) {
-            self::assertArrayHasKey($foreignKey->getForeignTableName(), $expectedColumns);
+            if (class_exists(ForeignKeyConstraintEditor::class)) {
+                self::assertArrayHasKey($foreignKey->getReferencedTableName()->toString(), $expectedColumns);
 
-            [$localColumns, $foreignColumns] = $expectedColumns[$foreignKey->getForeignTableName()];
+                [$localColumns, $foreignColumns] = $expectedColumns[$foreignKey->getReferencedTableName()->toString()];
 
-            self::assertSame($localColumns, $foreignKey->getLocalColumns());
-            self::assertSame($foreignColumns, $foreignKey->getForeignColumns());
+                self::assertSame($localColumns, array_map(static fn (UnqualifiedName $name) => $name->toString(), $foreignKey->getReferencingColumnNames()));
+                self::assertSame($foreignColumns, array_map(static fn (UnqualifiedName $name) => $name->toString(), $foreignKey->getReferencedColumnNames()));
+            } else {
+                self::assertArrayHasKey($foreignKey->getForeignTableName(), $expectedColumns);
+
+                [$localColumns, $foreignColumns] = $expectedColumns[$foreignKey->getForeignTableName()];
+
+                self::assertSame($localColumns, $foreignKey->getLocalColumns());
+                self::assertSame($foreignColumns, $foreignKey->getForeignColumns());
+            }
         }
     }
 

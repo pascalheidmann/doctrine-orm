@@ -8,6 +8,7 @@ use BackedEnum;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractAsset;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\ForeignKeyConstraintEditor;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Name\Identifier;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
@@ -34,6 +35,7 @@ use function array_diff_key;
 use function array_filter;
 use function array_flip;
 use function array_intersect_key;
+use function array_map;
 use function assert;
 use function class_exists;
 use function count;
@@ -729,7 +731,18 @@ class SchemaTool
         ) {
             foreach ($theJoinTable->getForeignKeys() as $fkName => $key) {
                 if (
-                    count(array_diff($key->getLocalColumns(), $localColumns)) === 0
+                    class_exists(ForeignKeyConstraintEditor::class)
+                    && count(array_diff(array_map(static fn (UnqualifiedName $name) => $name->toString(), $key->getReferencingColumnNames()), $localColumns)) === 0
+                    && (($key->getReferencedTableName()->toString() !== $foreignTableName)
+                    || 0 < count(array_diff(array_map(static fn (UnqualifiedName $name) => $name->toString(), $key->getReferencedColumnNames()), $foreignColumns)))
+                ) {
+                    $theJoinTable->dropForeignKey($fkName);
+                    break;
+                }
+
+                if (
+                    ! class_exists(ForeignKeyConstraintEditor::class)
+                    && count(array_diff($key->getLocalColumns(), $localColumns)) === 0
                     && (($key->getForeignTableName() !== $foreignTableName)
                     || 0 < count(array_diff($key->getForeignColumns(), $foreignColumns)))
                 ) {
