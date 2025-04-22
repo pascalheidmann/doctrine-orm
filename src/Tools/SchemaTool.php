@@ -43,6 +43,7 @@ use function current;
 use function implode;
 use function in_array;
 use function is_numeric;
+use function method_exists;
 use function strtolower;
 
 /**
@@ -321,7 +322,7 @@ class SchemaTool
             $primaryKey = $table->getIndex('primary');
 
             foreach ($table->getIndexes() as $idxKey => $existingIndex) {
-                if (! $existingIndex->isPrimary() && $primaryKey->spansColumns($existingIndex->getColumns())) {
+                if ($existingIndex !== $primaryKey && $primaryKey->spansColumns($existingIndex->getColumns())) {
                     $table->dropIndex($idxKey);
                 }
             }
@@ -860,12 +861,22 @@ class SchemaTool
             }
 
             foreach ($schema->getTables() as $table) {
-                $primaryKey = $table->getPrimaryKey();
+                if (method_exists($table, 'getPrimaryKeyConstraint')) {
+                    $primaryKey = $table->getPrimaryKeyConstraint();
+                } else {
+                    $primaryKey = $table->getPrimaryKey();
+                }
+
                 if ($primaryKey === null) {
                     continue;
                 }
 
-                $columns = $primaryKey->getColumns();
+                if ($primaryKey instanceof PrimaryKeyConstraint) {
+                    $columns = array_map(static fn (UnqualifiedName $name) => $name->toString(), $primaryKey->getColumnNames());
+                } else {
+                    $columns = $primaryKey->getColumns();
+                }
+
                 if (count($columns) === 1) {
                     $checkSequence = $table->getName() . '_' . $columns[0] . '_seq';
                     if ($deployedSchema->hasSequence($checkSequence) && ! $schema->hasSequence($checkSequence)) {
