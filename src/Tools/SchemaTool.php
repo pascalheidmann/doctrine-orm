@@ -10,6 +10,7 @@ use Doctrine\DBAL\Schema\AbstractAsset;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraintEditor;
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Index\IndexedColumn;
 use Doctrine\DBAL\Schema\Name\Identifier;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
@@ -322,7 +323,7 @@ class SchemaTool
             $primaryKey = $table->getIndex('primary');
 
             foreach ($table->getIndexes() as $idxKey => $existingIndex) {
-                if ($existingIndex !== $primaryKey && $primaryKey->spansColumns($existingIndex->getColumns())) {
+                if ($existingIndex !== $primaryKey && $primaryKey->spansColumns(self::getIndexedColumns($existingIndex))) {
                     $table->dropIndex($idxKey);
                 }
             }
@@ -353,7 +354,7 @@ class SchemaTool
                         }
                     }
 
-                    $table->addUniqueIndex($uniqIndex->getColumns(), is_numeric($indexName) ? null : $indexName, $indexData['options'] ?? []);
+                    $table->addUniqueIndex(self::getIndexedColumns($uniqIndex), is_numeric($indexName) ? null : $indexName, $indexData['options'] ?? []);
                 }
             }
 
@@ -874,7 +875,7 @@ class SchemaTool
                 if ($primaryKey instanceof PrimaryKeyConstraint) {
                     $columns = array_map(static fn (UnqualifiedName $name) => $name->toString(), $primaryKey->getColumnNames());
                 } else {
-                    $columns = $primaryKey->getColumns();
+                    $columns = self::getIndexedColumns($primaryKey);
                 }
 
                 if (count($columns) === 1) {
@@ -966,5 +967,15 @@ class SchemaTool
         } else {
             $table->setPrimaryKey($primaryKeyColumns);
         }
+    }
+
+    /** @return string[] */
+    private static function getIndexedColumns(Index $index): array
+    {
+        if (method_exists(Index::class, 'getIndexedColumns')) {
+            return array_map(static fn (IndexedColumn $indexedColumn) => $indexedColumn->getColumnName()->toString(), $index->getIndexedColumns());
+        }
+
+        return $index->getColumns();
     }
 }

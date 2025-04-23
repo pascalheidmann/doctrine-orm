@@ -1369,8 +1369,20 @@ parameters:
 			path: src/Mapping/Driver/DatabaseDriver.php
 
 		-
+			message: '#^Call to an undefined method Doctrine\\DBAL\\Schema\\Index\:\:getIndexedColumns\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Mapping/Driver/DatabaseDriver.php
+
+		-
 			message: '#^Call to an undefined method Doctrine\\DBAL\\Schema\\Table\:\:getPrimaryKeyConstraint\(\)\.$#'
 			identifier: method.notFound
+			count: 1
+			path: src/Mapping/Driver/DatabaseDriver.php
+
+		-
+			message: '#^Call to method getColumnName\(\) on an unknown class Doctrine\\DBAL\\Schema\\Index\\IndexedColumn\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Mapping/Driver/DatabaseDriver.php
 
@@ -1389,6 +1401,12 @@ parameters:
 		-
 			message: '#^Cannot call method getName\(\) on Doctrine\\DBAL\\Schema\\Column\|false\.$#'
 			identifier: method.nonObject
+			count: 1
+			path: src/Mapping/Driver/DatabaseDriver.php
+
+		-
+			message: '#^Class Doctrine\\DBAL\\Schema\\Index\\IndexType not found\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Mapping/Driver/DatabaseDriver.php
 
@@ -1435,9 +1453,21 @@ parameters:
 			path: src/Mapping/Driver/DatabaseDriver.php
 
 		-
+			message: '#^Parameter \#1 \$array of function sort contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: src/Mapping/Driver/DatabaseDriver.php
+
+		-
 			message: '#^Parameter \#2 \$columnName of method Doctrine\\ORM\\Mapping\\Driver\\DatabaseDriver\:\:getFieldNameForColumn\(\) expects string, string\|false given\.$#'
 			identifier: argument.type
 			count: 4
+			path: src/Mapping/Driver/DatabaseDriver.php
+
+		-
+			message: '#^Parameter \$indexedColumn of anonymous function has invalid type Doctrine\\DBAL\\Schema\\Index\\IndexedColumn\.$#'
+			identifier: class.notFound
+			count: 1
 			path: src/Mapping/Driver/DatabaseDriver.php
 
 		-
@@ -3115,6 +3145,12 @@ parameters:
 			path: src/Tools/SchemaTool.php
 
 		-
+			message: '#^Call to an undefined method Doctrine\\DBAL\\Schema\\Index\:\:getIndexedColumns\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Tools/SchemaTool.php
+
+		-
 			message: '#^Call to an undefined method Doctrine\\DBAL\\Schema\\Table\:\:dropForeignKey\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -3123,6 +3159,12 @@ parameters:
 		-
 			message: '#^Call to function is_numeric\(\) with int\<0, max\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Tools/SchemaTool.php
+
+		-
+			message: '#^Call to method getColumnName\(\) on an unknown class Doctrine\\DBAL\\Schema\\Index\\IndexedColumn\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Tools/SchemaTool.php
 
@@ -3243,6 +3285,12 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$classes of method Doctrine\\ORM\\Tools\\SchemaTool\:\:getUpdateSchemaSql\(\) expects list\<Doctrine\\ORM\\Mapping\\ClassMetadata\>, array\<mixed\> given\.$#'
 			identifier: argument.type
+			count: 1
+			path: src/Tools/SchemaTool.php
+
+		-
+			message: '#^Parameter \$indexedColumn of anonymous function has invalid type Doctrine\\DBAL\\Schema\\Index\\IndexedColumn\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Tools/SchemaTool.php
 

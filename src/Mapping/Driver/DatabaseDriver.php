@@ -7,6 +7,9 @@ namespace Doctrine\ORM\Mapping\Driver;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Index\IndexedColumn;
+use Doctrine\DBAL\Schema\Index\IndexType;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\SchemaException;
@@ -29,6 +32,7 @@ use function array_merge;
 use function assert;
 use function count;
 use function current;
+use function enum_exists;
 use function get_debug_type;
 use function in_array;
 use function method_exists;
@@ -291,7 +295,7 @@ class DatabaseDriver implements MappingDriver
             if ($primaryKey instanceof PrimaryKeyConstraint) {
                 $pkColumns = array_map(static fn (UnqualifiedName $name) => $name->toString(), $primaryKey->getColumnNames());
             } else {
-                $pkColumns = $primaryKey->getColumns();
+                $pkColumns = self::getIndexedColumns($primaryKey);
             }
 
             sort($pkColumns);
@@ -323,9 +327,15 @@ class DatabaseDriver implements MappingDriver
                 continue;
             }
 
+            if (enum_exists(IndexType::class) && method_exists($index, 'getType')) {
+                $isUnique = $index->getType() === IndexType::UNIQUE;
+            } else {
+                $isUnique = $index->isUnique();
+            }
+
             $indexName      = $index->getName();
-            $indexColumns   = $index->getColumns();
-            $constraintType = $index->isUnique()
+            $indexColumns   = self::getIndexedColumns($index);
+            $constraintType = $isUnique
                 ? 'uniqueConstraints'
                 : 'indexes';
 
@@ -500,7 +510,7 @@ class DatabaseDriver implements MappingDriver
                 return array_map(static fn (UnqualifiedName $name) => $name->toString(), $table->getPrimaryKeyConstraint()->getColumnNames());
             }
 
-            return $table->getPrimaryKey()->getColumns();
+            return self::getIndexedColumns($table->getPrimaryKey());
         } catch (SchemaException) {
             // Do nothing
         }
@@ -573,5 +583,15 @@ class DatabaseDriver implements MappingDriver
         }
 
         return $foreignKey->getForeignColumns();
+    }
+
+    /** @return string[] */
+    private static function getIndexedColumns(Index $index): array
+    {
+        if (method_exists(Index::class, 'getIndexedColumns')) {
+            return array_map(static fn (IndexedColumn $indexedColumn) => $indexedColumn->getColumnName()->toString(), $index->getIndexedColumns());
+        }
+
+        return $index->getColumns();
     }
 }

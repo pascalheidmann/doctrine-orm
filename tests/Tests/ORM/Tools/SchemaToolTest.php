@@ -6,6 +6,9 @@ namespace Doctrine\Tests\ORM\Tools;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Schema\ForeignKeyConstraintEditor;
+use Doctrine\DBAL\Schema\Index as DbalIndex;
+use Doctrine\DBAL\Schema\Index\IndexedColumn;
+use Doctrine\DBAL\Schema\Index\IndexType;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraintEditor;
 use Doctrine\DBAL\Schema\Table as DbalTable;
@@ -50,6 +53,8 @@ use function array_map;
 use function class_exists;
 use function count;
 use function current;
+use function enum_exists;
+use function method_exists;
 
 class SchemaToolTest extends OrmTestCase
 {
@@ -294,11 +299,11 @@ class SchemaToolTest extends OrmTestCase
         } else {
             $rootTable = $schema->getTable('joined_derived_root');
             self::assertNotNull($rootTable->getPrimaryKey());
-            self::assertSame(['keyPart1_id', 'keyPart2'], $rootTable->getPrimaryKey()->getColumns());
+            self::assertSame(['keyPart1_id', 'keyPart2'], self::getIndexedColumns($rootTable->getPrimaryKey()));
 
             $childTable = $schema->getTable('joined_derived_child');
             self::assertNotNull($childTable->getPrimaryKey());
-            self::assertSame(['keyPart1_id', 'keyPart2'], $childTable->getPrimaryKey()->getColumns());
+            self::assertSame(['keyPart1_id', 'keyPart2'], self::getIndexedColumns($childTable->getPrimaryKey()));
         }
 
         $childTableForeignKeys = $childTable->getForeignKeys();
@@ -339,8 +344,8 @@ class SchemaToolTest extends OrmTestCase
         $schema     = $schemaTool->getSchemaFromMetadata([$metadata]);
         $table      = $schema->getTable('field_index');
 
-        self::assertEquals(['index', 'field_name'], $table->getIndex('index')->getColumns());
-        self::assertEquals(['index', 'table'], $table->getIndex('uniq')->getColumns());
+        self::assertEquals(['index', 'field_name'], self::getIndexedColumns($table->getIndex('index')));
+        self::assertEquals(['index', 'table'], self::getIndexedColumns($table->getIndex('uniq')));
     }
 
     public function testIncorrectIndexesBasedOnFields(): void
@@ -418,8 +423,23 @@ class SchemaToolTest extends OrmTestCase
 
         $tableIndex = $tableEntity->getIndex('uniq_2d81a3ed5bf54558875f7fd5');
 
-        self::assertTrue($tableIndex->isUnique());
-        self::assertSame(['field', 'anotherField'], $tableIndex->getColumns());
+        if (enum_exists(IndexType::class)) {
+            self::assertSame(IndexType::UNIQUE, $tableIndex->getType());
+        } else {
+            self::assertTrue($tableIndex->isUnique());
+        }
+
+        self::assertSame(['field', 'anotherField'], self::getIndexedColumns($tableIndex));
+    }
+
+    /** @return string[] */
+    private static function getIndexedColumns(DbalIndex $index): array
+    {
+        if (method_exists(DbalIndex::class, 'getIndexedColumns')) {
+            return array_map(static fn (IndexedColumn $indexedColumn) => $indexedColumn->getColumnName()->toString(), $index->getIndexedColumns());
+        }
+
+        return $index->getColumns();
     }
 
     private static function columnIsIndexed(DbalTable $table, string $column): bool
