@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
@@ -274,7 +275,12 @@ class DatabaseDriver implements MappingDriver
                 $allForeignKeyColumns = array_merge($allForeignKeyColumns, self::getReferencingColumnNames($foreignKey));
             }
 
-            $primaryKey = $table->getPrimaryKey();
+            if (method_exists($table, 'getPrimaryKeyConstraint')) {
+                $primaryKey = $table->getPrimaryKeyConstraint();
+            } else {
+                $primaryKey = $table->getPrimaryKey();
+            }
+
             if ($primaryKey === null) {
                 throw new MappingException(
                     'Table ' . $tableName . ' has no primary key. Doctrine does not ' .
@@ -282,7 +288,11 @@ class DatabaseDriver implements MappingDriver
                 );
             }
 
-            $pkColumns = $primaryKey->getColumns();
+            if ($primaryKey instanceof PrimaryKeyConstraint) {
+                $pkColumns = array_map(static fn (UnqualifiedName $name) => $name->toString(), $primaryKey->getColumnNames());
+            } else {
+                $pkColumns = $primaryKey->getColumns();
+            }
 
             sort($pkColumns);
             sort($allForeignKeyColumns);
@@ -486,6 +496,10 @@ class DatabaseDriver implements MappingDriver
     private function getTablePrimaryKeys(Table $table): array
     {
         try {
+            if (method_exists($table, 'getPrimaryKeyConstraints')) {
+                return array_map(static fn (UnqualifiedName $name) => $name->toString(), $table->getPrimaryKeyConstraint()->getColumnNames());
+            }
+
             return $table->getPrimaryKey()->getColumns();
         } catch (SchemaException) {
             // Do nothing
