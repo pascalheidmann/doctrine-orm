@@ -1395,7 +1395,7 @@ parameters:
 		-
 			message: '#^Call to method toString\(\) on an unknown class Doctrine\\DBAL\\Schema\\Name\\UnqualifiedName\.$#'
 			identifier: class.notFound
-			count: 4
+			count: 5
 			path: src/Mapping/Driver/DatabaseDriver.php
 
 		-
@@ -1473,7 +1473,7 @@ parameters:
 		-
 			message: '#^Parameter \$name of anonymous function has invalid type Doctrine\\DBAL\\Schema\\Name\\UnqualifiedName\.$#'
 			identifier: class.notFound
-			count: 4
+			count: 5
 			path: src/Mapping/Driver/DatabaseDriver.php
 
 		-
