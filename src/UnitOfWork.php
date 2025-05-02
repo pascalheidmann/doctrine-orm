@@ -49,6 +49,7 @@ use Exception;
 use InvalidArgumentException;
 use RuntimeException;
 use Stringable;
+use Symfony\Component\VarExporter\Hydrator;
 use UnexpectedValueException;
 
 use function array_chunk;
@@ -2379,6 +2380,8 @@ class UnitOfWork implements PropertyChangedListener
 
             if ($this->isUninitializedObject($entity)) {
                 $entity->__setInitialized(true);
+
+                Hydrator::hydrate($entity, (array) $class->reflClass->newInstanceWithoutConstructor());
             } else {
                 if (
                     ! isset($hints[Query::HINT_REFRESH])

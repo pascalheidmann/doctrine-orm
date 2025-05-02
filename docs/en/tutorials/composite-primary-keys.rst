@@ -54,7 +54,7 @@ and year of production as primary keys:
 
         <?xml version="1.0" encoding="UTF-8"?>
         <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
-              xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                                   https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
@@ -175,7 +175,7 @@ We keep up the example of an Article with arbitrary attributes, the mapping look
     .. code-block:: xml
 
         <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
-              xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                                   https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
