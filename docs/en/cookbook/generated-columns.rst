@@ -16,6 +16,7 @@ specify that the column should not be written to, and define a custom column
 definition.
 
 .. code-block:: php
+
     .. literalinclude:: generated-columns/Person.php
 
 * ``insertable``, ``updatable``: Setting these to false tells Doctrine to never
@@ -41,4 +42,5 @@ To avoid extracting all titles on the fly when listing the posts, we create a
 generated column with the field.
 
 .. code-block:: php
+
     .. literalinclude:: generated-columns/Article.php
