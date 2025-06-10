@@ -138,7 +138,7 @@ class SimpleObjectHydrator extends AbstractHydrator
                 $value = $type->convertToPHPValue($value, $this->platform);
             }
 
-            if ($value !== null && isset($cacheKeyInfo['enumType'])) {
+            if ($value !== null && $value !== '' && isset($cacheKeyInfo['enumType'])) {
                 $originalValue = $currentValue = $value;
                 try {
                     if (! is_array($originalValue)) {
